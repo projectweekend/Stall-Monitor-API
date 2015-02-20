@@ -28,7 +28,7 @@ API Routes
 
 **POST:**
 ```
-/register/gcm
+/gcm
 ```
 
 **Body:**
@@ -52,7 +52,7 @@ API Routes
 
 **DELETE:**
 ```
-/register/gcm/:_id
+/gcm/:_id
 ```
 
 **Response: 204**
