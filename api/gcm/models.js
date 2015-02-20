@@ -7,7 +7,10 @@ var ObjectId = Schema.ObjectId;
 
 var GCMSchema = Schema ( {
     id: ObjectId,
-    token: String
+    token: {
+        type: String,
+        index: true
+    }
 } );
 
 

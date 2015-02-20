@@ -1,5 +1,6 @@
 var express = require( "express" );
 var expressValidator = require( "express-validator" );
+var cors = require( "cors" );
 var logger = require( "morgan" );
 var bodyParser = require( "body-parser" );
 var authUtils = require( "api-utils" ).authentication;
@@ -19,6 +20,8 @@ app.use( expressValidator() );
 app.use( bodyParser.urlencoded( {
     extended: false
 } ) );
+
+app.use( cors() );
 
 app.use( authUtils.systemAPIKey( [ "/ping" ] ) );
 
