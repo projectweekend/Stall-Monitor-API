@@ -5,7 +5,7 @@ API Routes
 
 **GET:**
 ```
-/activity
+/current
 ```
 
 **Response:**
