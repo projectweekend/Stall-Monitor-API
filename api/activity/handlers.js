@@ -1,20 +1,32 @@
-var mongoose = require( "mongoose" );
+var Listener = require( "./rabbit" ).Listener;
+
+var doorStatus;
+var error;
+
+function setDoorStatus ( err, data ) {
+    if ( err ) {
+        error = err;
+        doorStatus = null;
+    } else {
+        error = null;
+        doorStatus = data;
+    }
+}
+
+var statusListener = new Listener(
+    process.env.RABBIT_URL,
+    "gpio_broadcast",
+    "stall_monitor"
+);
+
+statusListener.start( setDoorStatus );
 
 
 exports.current = function ( req, res, next ) {
 
-    mongoose.connection.db.collection( "activity", function ( err, collection ) {
-
-        collection.find().sort( { date: -1 } ).limit( 1 ).toArray( function ( err, result ) {
-
-            if ( err ) {
-                return next( err );
-            }
-
-            return res.status( 200 ).json( result );
-
-        } );
-
-    } );
+    if ( error ) {
+        return next( error );
+    }
+    return res.status( 200 ).json( doorStatus );
 
 };
