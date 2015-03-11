@@ -11,7 +11,9 @@ var Listner = function ( rabbitURL, exchange, routingKey ) {
     this._channel = null;
 };
 
-
+// `action` function receives two params:
+// data - which is an object that was created be parsing the JSON message body
+// callback - a function that receives an error if one was generated inside `action`
 Listner.prototype.start = function( action ) {
 
     var _this = this;
@@ -61,6 +63,7 @@ Listner.prototype.start = function( action ) {
 
     function onMessage ( msg ) {
         var data = JSON.parse( msg.content.toString() );
+        // if there was not an error we ack the message from the queue
         action( data, function ( err ) {
             if ( err ) {
                 throw err;

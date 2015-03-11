@@ -1,17 +1,8 @@
+var mongoose = require( "mongoose" );
 var Listener = require( "./rabbit" ).Listener;
 
 var doorStatus;
-var error;
 
-function setDoorStatus ( err, data ) {
-    if ( err ) {
-        error = err;
-        doorStatus = null;
-    } else {
-        error = null;
-        doorStatus = data;
-    }
-}
 
 var statusListener = new Listener(
     process.env.RABBIT_URL,
@@ -19,14 +10,31 @@ var statusListener = new Listener(
     "stall_monitor"
 );
 
-statusListener.start( setDoorStatus );
+statusListener.start( function ( data, done ) {
+    doorStatus = data;
+    done();
+} );
 
 
 exports.current = function ( req, res, next ) {
 
-    if ( error ) {
-        return next( error );
+    // Look up last status in cases where server was restarted
+    if ( !doorStatus ) {
+        mongoose.connection.db.collection( "activity", function ( err, collection ) {
+
+            collection.find().sort( { date: -1 } ).limit( 1 ).toArray( function ( err, result ) {
+
+                if ( err ) {
+                    return next( err );
+                }
+
+                return res.status( 200 ).json( result );
+
+            } );
+
+        } );
     }
+
     return res.status( 200 ).json( doorStatus );
 
 };
