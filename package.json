@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "amqplib": "^0.3.1",
     "api-utils": "git://github.com/projectweekend/Node-API-Utils",
     "async": "^0.9.0",
     "body-parser": "~1.10.2",
