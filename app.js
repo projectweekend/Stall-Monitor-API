@@ -4,11 +4,8 @@ var cors = require( "cors" );
 var logger = require( "morgan" );
 var bodyParser = require( "body-parser" );
 var authUtils = require( "api-utils" ).authentication;
-var databaseUtils = require( "api-utils" ).database;
 
 var routes = require( "./routes/index" );
-
-var db = databaseUtils.mongooseConnection();
 
 var app = express();
 

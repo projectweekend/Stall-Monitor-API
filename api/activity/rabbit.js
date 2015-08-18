@@ -1,20 +1,26 @@
+var util = require( "util" );
+var EventEmitter = require( "events" ).EventEmitter;
 var async = require( "async" );
 var amqp = require( "amqplib/callback_api" );
 
 
-var Listner = function ( rabbitURL, exchange, routingKey ) {
+exports.Listener = Listner;
+
+
+function Listner ( rabbitURL, exchange, routingKey ) {
+    EventEmitter.call( this );
     this._rabbitURL = rabbitURL;
     this._exchange = exchange;
     this._queue = null;
     this._routingKey = routingKey;
     this._connection = null;
     this._channel = null;
-};
+    this.start();
+}
 
-// `action` function receives two params:
-// data - which is an object that was created be parsing the JSON message body
-// callback - a function that receives an error if one was generated inside `action`
-Listner.prototype.start = function( action ) {
+util.inherits( Listner, EventEmitter );
+
+Listner.prototype.start = function() {
 
     var _this = this;
 
@@ -63,13 +69,8 @@ Listner.prototype.start = function( action ) {
 
     function onMessage ( msg ) {
         var data = JSON.parse( msg.content.toString() );
-        // if there was not an error we ack the message from the queue
-        action( data, function ( err ) {
-            if ( err ) {
-                throw err;
-            }
-            _this._channel.ack( msg );
-        } );
+        _this.emit( "message", data );
+        _this._channel.ack( msg );
     }
 
     function startConsuming ( done ) {
@@ -82,6 +83,7 @@ Listner.prototype.start = function( action ) {
         if ( err ) {
             throw err;
         }
+        console.log( "Listener created..." );
     }
 
     async.series( [
@@ -94,5 +96,3 @@ Listner.prototype.start = function( action ) {
     ], allDone );
 
 };
-
-exports.Listner = Listner;
